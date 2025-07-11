@@ -1,7 +1,66 @@
+// Function to save user preferences to localStorage
+function savePreferences() {
+  // Get values from all form inputs
+  const preferences = {
+    timeOfDay: document.getElementById("timeOfDay").value,
+    focusArea: document.getElementById("focusArea").value,
+    timeAvailable: document.getElementById("timeAvailable").value,
+    energyLevel: document.getElementById("energyLevel").value,
+    activities: [],
+  };
+
+  // Get all checked activities
+  const activityCheckboxes = document.querySelectorAll(
+    'input[name="activities"]:checked'
+  );
+  activityCheckboxes.forEach((checkbox) => {
+    preferences.activities.push(checkbox.value);
+  });
+
+  // Save preferences to localStorage as a JSON string
+  localStorage.setItem("routinePreferences", JSON.stringify(preferences));
+}
+
+// Function to load user preferences from localStorage
+function loadPreferences() {
+  // Get saved preferences from localStorage
+  const savedPreferences = localStorage.getItem("routinePreferences");
+
+  // If no preferences are saved, exit the function
+  if (!savedPreferences) {
+    return;
+  }
+
+  // Parse the saved preferences from JSON string
+  const preferences = JSON.parse(savedPreferences);
+
+  // Set the dropdown values to the saved preferences
+  document.getElementById("timeOfDay").value = preferences.timeOfDay;
+  document.getElementById("focusArea").value = preferences.focusArea;
+  document.getElementById("timeAvailable").value = preferences.timeAvailable;
+  document.getElementById("energyLevel").value = preferences.energyLevel;
+
+  // Check the saved activity checkboxes
+  preferences.activities.forEach((activity) => {
+    const checkbox = document.querySelector(
+      `input[name="activities"][value="${activity}"]`
+    );
+    if (checkbox) {
+      checkbox.checked = true;
+    }
+  });
+}
+
+// Load saved preferences when the page loads
+document.addEventListener("DOMContentLoaded", loadPreferences);
+
 // Add an event listener to the form that runs when the form is submitted
 document.getElementById("routineForm").addEventListener("submit", async (e) => {
   // Prevent the form from refreshing the page
   e.preventDefault();
+
+  // Save current preferences before generating routine
+  savePreferences();
 
   // Get values from all form inputs and store them in variables
   const timeOfDay = document.getElementById("timeOfDay").value;
